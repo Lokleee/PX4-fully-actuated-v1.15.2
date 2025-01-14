@@ -96,6 +96,7 @@ if(gazebo_FOUND)
 		quadtailsitter
 		r1_rover
 		rover
+		skyvortex
 		standard_vtol
 		standard_vtol_drop
 		tailsitter
@@ -113,6 +114,7 @@ if(gazebo_FOUND)
 		ksql_airport
 		mcmillan_airfield
 		ramped_up_wind
+		skyvortex
 		sonoma_raceway
 		warehouse
 		windy

@@ -520,6 +520,8 @@ void MulticopterPositionControl::Run()
 				_vehicle_constraints = {0, NAN, NAN, false, {}}; // reset constraints
 
 				_control.setInputSetpoint(generateFailsafeSetpoint(vehicle_local_position.timestamp_sample, states, true));
+				float max_hor_thrust = (_param_omni_att_mode.get() == 1) ? _param_omni_dfc_max_thr.get() : 1.0F;
+				_control.setHoverThrustLimits(max_hor_thrust);
 				_control.setVelocityLimits(_param_mpc_xy_vel_max.get(), _param_mpc_z_vel_max_up.get(), _param_mpc_z_vel_max_dn.get());
 				_control.update(dt);
 			}
@@ -534,7 +536,7 @@ void MulticopterPositionControl::Run()
 
 			// Publish attitude setpoint output
 			vehicle_attitude_setpoint_s attitude_setpoint{};
-			_control.getAttitudeSetpoint(attitude_setpoint);
+			_control.getAttitudeSetpoint(attitude_setpoint,_param_omni_att_mode.get());
 			attitude_setpoint.timestamp = hrt_absolute_time();
 			_vehicle_attitude_setpoint_pub.publish(attitude_setpoint);
 

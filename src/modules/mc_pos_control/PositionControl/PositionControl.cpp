@@ -72,6 +72,11 @@ void PositionControl::setHorizontalThrustMargin(const float margin)
 	_lim_thr_xy_margin = margin;
 }
 
+void PositionControl::setHoverThrustLimits(const float lim_thr_hor_max)
+{
+	_lim_thr_hor_max = lim_thr_hor_max;
+}
+
 void PositionControl::updateHoverThrust(const float hover_thrust_new)
 {
 	// Given that the equation for thrust is T = a_sp * Th / g - Th
@@ -176,6 +181,7 @@ void PositionControl::_velocityControl(const float dt)
 	if (thrust_max_xy_squared > 0.f) {
 		thrust_max_xy = sqrtf(thrust_max_xy_squared);
 	}
+	// thrust_max_xy = math::min(_lim_thr_hor_max, thrust_max_xy);
 
 	// Saturate thrust in horizontal direction
 	if (thrust_sp_xy_norm > thrust_max_xy) {
@@ -263,8 +269,8 @@ void PositionControl::getLocalPositionSetpoint(vehicle_local_position_setpoint_s
 	_thr_sp.copyTo(local_position_setpoint.thrust);
 }
 
-void PositionControl::getAttitudeSetpoint(vehicle_attitude_setpoint_s &attitude_setpoint) const
+void PositionControl::getAttitudeSetpoint(vehicle_attitude_setpoint_s &attitude_setpoint, const int omni_att_mode) const
 {
-	ControlMath::thrustToAttitude(_thr_sp, _yaw_sp, attitude_setpoint);
+	ControlMath::thrustToAttitude(_thr_sp, _yaw_sp, attitude_setpoint,omni_att_mode);
 	attitude_setpoint.yaw_sp_move_rate = _yawspeed_sp;
 }

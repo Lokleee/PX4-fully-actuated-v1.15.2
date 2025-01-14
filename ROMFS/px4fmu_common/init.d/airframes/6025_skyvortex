@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# @name Skyvortex
+#
+# @type Tilt-Hexarotor
+# @class Copter
+#
+# @maintainer Li Zhengchen <lizc@hnu.edu.cn>
+#
+
+. ${R}etc/init.d/rc.mc_defaults
+
+# MAV_TYPE_HEXAROTOR 13
+param set-default MAV_TYPE 13
+
+param set-default CA_ROTOR_COUNT 6
+param set-default CA_ROTOR0_PX 0.0002289
+param set-default CA_ROTOR0_PY 0.4999999
+param set-default CA_ROTOR0_AX 0.5
+param set-default CA_ROTOR0_AY 0.0
+param set-default CA_ROTOR0_AZ -0.866025
+param set-default CA_ROTOR0_KM -0.05
+param set-default CA_ROTOR1_PX 0.0002289
+param set-default CA_ROTOR1_PY -0.4999999
+param set-default CA_ROTOR1_AX 0.5
+param set-default CA_ROTOR1_AY 0.0
+param set-default CA_ROTOR1_AZ -0.866025
+param set-default CA_ROTOR2_PX 0.4328847
+param set-default CA_ROTOR2_PY -0.25019825
+param set-default CA_ROTOR2_AX -0.25
+param set-default CA_ROTOR2_AY -0.4330125
+param set-default CA_ROTOR2_AZ -0.866025
+param set-default CA_ROTOR2_KM -0.05
+param set-default CA_ROTOR3_PX -0.4328847
+param set-default CA_ROTOR3_PY 0.25019825
+param set-default CA_ROTOR3_AX -0.25
+param set-default CA_ROTOR3_AY -0.4330125
+param set-default CA_ROTOR3_AZ -0.866025
+param set-default CA_ROTOR4_PX 0.4328847
+param set-default CA_ROTOR4_PY 0.25019825
+param set-default CA_ROTOR4_AX -0.25
+param set-default CA_ROTOR4_AY 0.4330125
+param set-default CA_ROTOR4_AZ -0.866025
+param set-default CA_ROTOR5_PX -0.4328847
+param set-default CA_ROTOR5_PY -0.25019825
+param set-default CA_ROTOR5_AX -0.25
+param set-default CA_ROTOR5_AY 0.4330125
+param set-default CA_ROTOR5_AZ -0.866025
+param set-default CA_ROTOR5_KM -0.05
+
+

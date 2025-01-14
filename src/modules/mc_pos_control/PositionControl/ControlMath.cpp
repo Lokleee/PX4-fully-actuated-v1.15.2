@@ -44,10 +44,22 @@ using namespace matrix;
 
 namespace ControlMath
 {
-void thrustToAttitude(const Vector3f &thr_sp, const float yaw_sp, vehicle_attitude_setpoint_s &att_sp)
+void thrustToAttitude(const Vector3f &thr_sp, const float yaw_sp, vehicle_attitude_setpoint_s &att_sp,const int omni_att_mode)
 {
-	bodyzToAttitude(-thr_sp, yaw_sp, att_sp);
-	att_sp.thrust_body[2] = -thr_sp.length();
+	// Print an error if the omni_att_mode parameter is out of range
+	if (omni_att_mode > 6 || omni_att_mode < 0) {
+		//PX4_ERR("OMNI_ATT_MODE parameter set to unknown value!");
+	}
+
+	switch (omni_att_mode) {
+	case 1: // Attitude is set to the fixed zero roll and pitch (used for omnidirectional vehicles)
+		thrustToZeroTiltAttitude(thr_sp, yaw_sp, att_sp);
+		break;
+
+	default:
+		bodyzToAttitude(-thr_sp, yaw_sp, att_sp);
+		att_sp.thrust_body[2] = -thr_sp.length();
+	}
 }
 
 void limitTilt(Vector3f &body_unit, const Vector3f &world_unit, const float max_angle)
@@ -117,6 +129,47 @@ void bodyzToAttitude(Vector3f body_z, const float yaw_sp, vehicle_attitude_setpo
 	att_sp.roll_body = euler.phi();
 	att_sp.pitch_body = euler.theta();
 	att_sp.yaw_body = euler.psi();
+}
+
+void thrustToZeroTiltAttitude(const Vector3f &thr_sp, const float yaw_sp, vehicle_attitude_setpoint_s &att_sp)
+{
+	// set Z axis to upward direction
+	Vector3f body_z = Vector3f(0.f, 0.f, 1.f);
+
+	// desired body_x and body_y axis
+	Vector3f body_x = Vector3f(cos(yaw_sp), sin(yaw_sp), 0.0f);
+	Vector3f body_y = Vector3f(-sinf(yaw_sp), cosf(yaw_sp), 0.0f);
+
+	Dcmf R_sp;
+
+	// fill rotation matrix
+	for (int i = 0; i < 3; i++) {
+		R_sp(i, 0) = body_x(i);
+		R_sp(i, 1) = body_y(i);
+		R_sp(i, 2) = body_z(i);
+	}
+
+	// copy quaternion setpoint to attitude setpoint topic
+	Quatf q_sp = R_sp;
+	q_sp.copyTo(att_sp.q_d);
+
+	// set the euler angles, for logging only, must not be used for control
+	att_sp.roll_body = 0;
+	att_sp.pitch_body = 0;
+	att_sp.yaw_body = yaw_sp;
+
+
+	// matrix::Dcmf R_body = att;
+
+	// for (int i = 0; i < 3; i++) {
+	// 	body_x(i) = R_body(i, 0);
+	// 	body_y(i) = R_body(i, 1);
+	// 	body_z(i) = R_body(i, 2);
+	// }
+
+	att_sp.thrust_body[0] = thr_sp.dot(body_x);
+	att_sp.thrust_body[1] = thr_sp.dot(body_y);
+	att_sp.thrust_body[2] = thr_sp.dot(body_z);
 }
 
 Vector2f constrainXY(const Vector2f &v0, const Vector2f &v1, const float &max)

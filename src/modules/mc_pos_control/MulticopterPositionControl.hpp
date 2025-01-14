@@ -162,6 +162,8 @@ private:
 		(ParamFloat<px4::params::MPC_LAND_ALT2>)    _param_mpc_land_alt2,    /**< downwards speed limited below this altitude */
 		(ParamInt<px4::params::MPC_POS_MODE>)       _param_mpc_pos_mode,
 		(ParamInt<px4::params::MPC_ALT_MODE>)       _param_mpc_alt_mode,
+		(ParamInt<px4::params::OMNI_ATT_MODE>)      _param_omni_att_mode,
+		(ParamFloat<px4::params::OMNI_DFC_MAX_THR>) _param_omni_dfc_max_thr,
 		(ParamFloat<px4::params::MPC_TILTMAX_LND>)  _param_mpc_tiltmax_lnd,  /**< maximum tilt for landing and smooth takeoff */
 		(ParamFloat<px4::params::MPC_THR_MIN>)      _param_mpc_thr_min,
 		(ParamFloat<px4::params::MPC_THR_MAX>)      _param_mpc_thr_max,

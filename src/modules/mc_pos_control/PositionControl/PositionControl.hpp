@@ -102,6 +102,12 @@ public:
 	void setVelocityLimits(const float vel_horizontal, const float vel_up, float vel_down);
 
 	/**
+	 * Set the maximum velocity to execute with feed forward and position control
+	 * @param lim_thr_hor_max maximum horizontal thrust (read from parameter for OMNI_ATT_MODE = 2, otherwise = 1.0F)
+	 */
+	void setHoverThrustLimits(const float lim_thr_hor_max);
+
+	/**
 	 * Set the minimum and maximum collective normalized thrust [0,1] that can be output by the controller
 	 * @param min minimum thrust e.g. 0.1 or 0
 	 * @param max maximum thrust e.g. 0.9 or 1
@@ -182,7 +188,7 @@ public:
 	 * It needs to be executed by the attitude controller to achieve velocity and position tracking.
 	 * @param attitude_setpoint reference to struct to fill up
 	 */
-	void getAttitudeSetpoint(vehicle_attitude_setpoint_s &attitude_setpoint) const;
+	void getAttitudeSetpoint(vehicle_attitude_setpoint_s &attitude_setpoint, const int omni_att_mode) const;
 
 	/**
 	 * All setpoints are set to NAN (uncontrolled). Timestampt zero.
@@ -214,6 +220,7 @@ private:
 	float _lim_thr_max{}; ///< Maximum collective thrust allowed as output [-1,0] e.g. -0.1
 	float _lim_thr_xy_margin{}; ///< Margin to keep for horizontal control when saturating prioritized vertical thrust
 	float _lim_tilt{}; ///< Maximum tilt from level the output attitude is allowed to have
+	float _lim_thr_hor_max; ///< Maximum direct-force horizontal thrust allowed as output [0, 1]
 
 	float _hover_thrust{}; ///< Thrust [HOVER_THRUST_MIN, HOVER_THRUST_MAX] with which the vehicle hovers not accelerating down or up with level orientation
 	bool _decouple_horizontal_and_vertical_acceleration{true}; ///< Ignore vertical acceleration setpoint to remove its effect on the tilt setpoint
