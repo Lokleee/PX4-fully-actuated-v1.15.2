@@ -187,8 +187,10 @@ public:
 	 * This attitude setpoint was generated from the resulting acceleration setpoint after position and velocity control.
 	 * It needs to be executed by the attitude controller to achieve velocity and position tracking.
 	 * @param attitude_setpoint reference to struct to fill up
+	 * @param omni_att_mode change to different attitude mode of fully-actuated multirotors
+	 * @param z3 disturbance
 	 */
-	void getAttitudeSetpoint(vehicle_attitude_setpoint_s &attitude_setpoint, const int omni_att_mode) const;
+	void getAttitudeSetpoint(vehicle_attitude_setpoint_s &attitude_setpoint, const int omni_att_mode, const matrix::Vector3f z3) const;
 
 	/**
 	 * All setpoints are set to NAN (uncontrolled). Timestampt zero.

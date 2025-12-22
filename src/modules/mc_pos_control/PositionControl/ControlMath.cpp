@@ -44,7 +44,7 @@ using namespace matrix;
 
 namespace ControlMath
 {
-void thrustToAttitude(const Vector3f &thr_sp, const float yaw_sp, vehicle_attitude_setpoint_s &att_sp,const int omni_att_mode)
+void thrustToAttitude(const Vector3f &thr_sp, const float yaw_sp, vehicle_attitude_setpoint_s &att_sp,const int omni_att_mode, const matrix::Vector3f z3)
 {
 	// Print an error if the omni_att_mode parameter is out of range
 	if (omni_att_mode > 6 || omni_att_mode < 0) {
@@ -53,7 +53,7 @@ void thrustToAttitude(const Vector3f &thr_sp, const float yaw_sp, vehicle_attitu
 
 	switch (omni_att_mode) {
 	case 1: // Attitude is set to the fixed zero roll and pitch (used for omnidirectional vehicles)
-		thrustToZeroTiltAttitude(thr_sp, yaw_sp, att_sp);
+		thrustToZeroTiltAttitude(thr_sp, yaw_sp, att_sp, z3);
 		break;
 
 	default:
@@ -131,7 +131,7 @@ void bodyzToAttitude(Vector3f body_z, const float yaw_sp, vehicle_attitude_setpo
 	att_sp.yaw_body = euler.psi();
 }
 
-void thrustToZeroTiltAttitude(const Vector3f &thr_sp, const float yaw_sp, vehicle_attitude_setpoint_s &att_sp)
+void thrustToZeroTiltAttitude(const Vector3f &thr_sp, const float yaw_sp, vehicle_attitude_setpoint_s &att_sp, const matrix::Vector3f z3)
 {
 	// set Z axis to upward direction
 	Vector3f body_z = Vector3f(0.f, 0.f, 1.f);
@@ -167,8 +167,8 @@ void thrustToZeroTiltAttitude(const Vector3f &thr_sp, const float yaw_sp, vehicl
 	// 	body_z(i) = R_body(i, 2);
 	// }
 
-	att_sp.thrust_body[0] = thr_sp.dot(body_x);
-	att_sp.thrust_body[1] = thr_sp.dot(body_y);
+	att_sp.thrust_body[0] = thr_sp.dot(body_x)-z3(0);
+	att_sp.thrust_body[1] = thr_sp.dot(body_y)-z3(1);
 	att_sp.thrust_body[2] = thr_sp.dot(body_z);
 }
 

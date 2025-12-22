@@ -196,3 +196,28 @@ PARAM_DEFINE_FLOAT(MPC_Z_MAN_EXPO, 0.6f);
  * @group Multicopter Position Control
  */
 PARAM_DEFINE_FLOAT(MPC_YAW_EXPO, 0.6f);
+
+/**
+ * Multicopter Position ESO Bandwidth
+ *
+ * This defines the bandwidth (w_p) of the third-order Extended State Observer (ESO)
+ * used for position and velocity estimation, and external disturbance compensation
+ * in the position control loop.
+ *
+ * A larger bandwidth improves the tracking of the total disturbance (e.g., wind gusts,
+ * unexpected payload changes, and aerodynamic coupling) and reduces the estimation
+ * error bound.
+ *
+ * However, a high bandwidth significantly amplifies the noise from the position sensor
+ * (e.g., GPS jitter or visual odometry noise), which can lead to aggressive and unstable
+ * thrust commands.
+ *
+ * Set to 0 to disable the position ESO and revert to standard position control.
+ *
+ * @min 0.0
+ * @max 20.0
+ * @decimal 1
+ * @increment 0.1
+ * @group Multicopter Position Control
+ */
+PARAM_DEFINE_FLOAT(MC_POS_ESO_BW, 0.5f);

@@ -148,6 +148,8 @@ private:
 		(ParamBool<px4::params::MPC_USE_HTE>)       _param_mpc_use_hte,
 		(ParamBool<px4::params::MPC_ACC_DECOUPLE>)  _param_mpc_acc_decouple,
 
+		(ParamFloat<px4::params::MC_POS_ESO_BW>)    _param_mc_pos_eso_bw,
+
 		// Takeoff / Land
 		(ParamFloat<px4::params::COM_SPOOLUP_TIME>) _param_com_spoolup_time, /**< time to let motors spool up after arming */
 		(ParamBool<px4::params::COM_THROW_EN>)      _param_com_throw_en, /**< throw launch enabled  */
@@ -214,7 +216,24 @@ private:
 	uint8_t _z_reset_counter{0};
 	uint8_t _heading_reset_counter{0};
 
+	// ESO
+	float _bw{0.0f};
+	float _beta1{0.0f};
+	float _beta2{0.0f};
+	float _beta3{0.0f};
+	matrix::Vector3f _z1{};
+	matrix::Vector3f _z2{};
+	matrix::Vector3f _z3{};
+
 	perf_counter_t _cycle_perf{perf_alloc(PC_ELAPSED, MODULE_NAME": cycle time")};
+
+	/**
+	 * Pos ESO
+	 * @param thrust thrust
+	 * @param pos pos
+	 * @param dt thrust
+	 */
+	void updatePositionESO(const matrix::Vector3f thrust, const matrix::Vector3f pos, float dt);
 
 	/**
 	 * Update our local parameter cache.

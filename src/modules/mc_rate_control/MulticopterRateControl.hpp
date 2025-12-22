@@ -88,6 +88,7 @@ private:
 	void parameters_updated();
 
 	void updateActuatorControlsStatus(const vehicle_torque_setpoint_s &vehicle_torque_setpoint, float dt);
+	void updateAttitudeESO(const matrix::Vector3f &torque, const matrix::Vector3f &rate, float dt);
 
 	RateControl _rate_control; ///< class for rate control calculations
 
@@ -129,6 +130,12 @@ private:
 	float _energy_integration_time{0.0f};
 	float _control_energy[4] {};
 
+	matrix::Vector3f _z1{};  /**< estimator of anguler velocity */
+	matrix::Vector3f _z2{};  /**< estimator of total disturbence */
+	float _bandwith{0.0f};
+	float _beta1{0.0f};
+	float _beta2{0.0f};
+
 	DEFINE_PARAMETERS(
 		(ParamFloat<px4::params::MC_ROLLRATE_P>) _param_mc_rollrate_p,
 		(ParamFloat<px4::params::MC_ROLLRATE_I>) _param_mc_rollrate_i,
@@ -150,6 +157,8 @@ private:
 		(ParamFloat<px4::params::MC_YAWRATE_D>) _param_mc_yawrate_d,
 		(ParamFloat<px4::params::MC_YAWRATE_FF>) _param_mc_yawrate_ff,
 		(ParamFloat<px4::params::MC_YAWRATE_K>) _param_mc_yawrate_k,
+
+		(ParamFloat<px4::params::MC_ATTI_ESO_BW>) _param_mc_atti_eso_bw,
 
 		(ParamFloat<px4::params::MC_ACRO_R_MAX>) _param_mc_acro_r_max,
 		(ParamFloat<px4::params::MC_ACRO_P_MAX>) _param_mc_acro_p_max,

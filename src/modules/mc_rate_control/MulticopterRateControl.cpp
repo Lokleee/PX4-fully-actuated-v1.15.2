@@ -95,6 +95,10 @@ MulticopterRateControl::parameters_updated()
 	// manual rate control acro mode rate limits
 	_acro_rate_max = Vector3f(radians(_param_mc_acro_r_max.get()), radians(_param_mc_acro_p_max.get()),
 				  radians(_param_mc_acro_y_max.get()));
+
+	_bandwith = _param_mc_atti_eso_bw.get();
+	_beta1 = 2.0f * _bandwith;
+	_beta2 = _bandwith * _bandwith;
 }
 
 void
@@ -227,9 +231,9 @@ MulticopterRateControl::Run()
 			vehicle_torque_setpoint_s vehicle_torque_setpoint{};
 
 			_thrust_setpoint.copyTo(vehicle_thrust_setpoint.xyz);
-			vehicle_torque_setpoint.xyz[0] = PX4_ISFINITE(att_control(0)) ? att_control(0) : 0.f;
-			vehicle_torque_setpoint.xyz[1] = PX4_ISFINITE(att_control(1)) ? att_control(1) : 0.f;
-			vehicle_torque_setpoint.xyz[2] = PX4_ISFINITE(att_control(2)) ? att_control(2) : 0.f;
+			vehicle_torque_setpoint.xyz[0] = PX4_ISFINITE(att_control(0)) ? att_control(0)-_z2(0) : 0.f;
+			vehicle_torque_setpoint.xyz[1] = PX4_ISFINITE(att_control(1)) ? att_control(1)-_z2(1) : 0.f;
+			vehicle_torque_setpoint.xyz[2] = PX4_ISFINITE(att_control(2)) ? att_control(2)-_z2(2) : 0.f;
 
 			// scale setpoints by battery status if enabled
 			if (_param_mc_bat_scale_en.get()) {
@@ -259,10 +263,22 @@ MulticopterRateControl::Run()
 
 			updateActuatorControlsStatus(vehicle_torque_setpoint, dt);
 
+			const Vector3f torques{vehicle_torque_setpoint.xyz};
+			updateAttitudeESO(torques, rates, dt);
 		}
 	}
 
 	perf_end(_loop_perf);
+}
+
+void MulticopterRateControl::updateAttitudeESO(const matrix::Vector3f &torque, const matrix::Vector3f &rate, float dt)
+{
+	Vector3f rate_error = rate - _z1;
+	Vector3f dot_z1 = torque + _z2 + _beta1 * rate_error;
+	Vector3f dot_z2 = _beta2 * rate_error;
+
+	_z1 += dot_z1 * dt;
+	_z2 += dot_z2 * dt;
 }
 
 void MulticopterRateControl::updateActuatorControlsStatus(const vehicle_torque_setpoint_s &vehicle_torque_setpoint,

@@ -292,3 +292,25 @@ PARAM_DEFINE_FLOAT(MC_YAWRATE_K, 1.0f);
  * @group Multicopter Rate Control
  */
 PARAM_DEFINE_INT32(MC_BAT_SCALE_EN, 0);
+
+/**
+ * Multicopter Attitude ESO Bandwidth
+ *
+ * This defines the bandwidth (w_omega) of the Extended State Observer (ESO) used
+ * for attitude rate coupling estimation.
+ *
+ * The bandwidth determines how fast the observer tracks the system states and
+ * estimates the total disturbance (external wind, internal coupling, model uncertainty).
+ * A larger value results in a smaller estimation error bound and stronger disturbance
+ * rejection (stiffer system). However, if the value is too high, it will amplify
+ * gyroscope noise, potentially causing motor overheating or oscillation.
+ *
+ * Set to 0 to disable the ESO and revert to standard PID control.
+ *
+ * @min 0.0
+ * @max 20.0
+ * @decimal 1
+ * @increment 0.5
+ * @group Multicopter Rate Control
+ */
+PARAM_DEFINE_FLOAT(MC_ATTI_ESO_BW, 0.5f);

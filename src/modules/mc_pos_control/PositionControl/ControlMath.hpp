@@ -51,9 +51,10 @@ namespace ControlMath
  * @param yaw_sp the desired yaw
  * @param att_sp attitude setpoint to fill
  * @param omni_att_mode attitude mode for omnidirectional vehicles
+ * @param z3 disturbance
  */
 void thrustToAttitude(const matrix::Vector3f &thr_sp, const float yaw_sp, vehicle_attitude_setpoint_s &att_sp,
-		      const int omni_att_mode);
+		      const int omni_att_mode, const matrix::Vector3f z3);
 
 /**
  * Limits the tilt angle between two unit vectors
@@ -76,8 +77,9 @@ void bodyzToAttitude(matrix::Vector3f body_z, const float yaw_sp, vehicle_attitu
  * @param thr_sp a 3D vector
  * @param yaw_sp the desired yaw
  * @param att_sp attitude setpoint to fill
+ * @param z3 disturbance
  */
-void thrustToZeroTiltAttitude(const matrix::Vector3f &thr_sp, const float yaw_sp, vehicle_attitude_setpoint_s &att_sp);
+void thrustToZeroTiltAttitude(const matrix::Vector3f &thr_sp, const float yaw_sp, vehicle_attitude_setpoint_s &att_sp, const matrix::Vector3f z3);
 
 /**
  * Outputs the sum of two vectors but respecting the limits and priority.

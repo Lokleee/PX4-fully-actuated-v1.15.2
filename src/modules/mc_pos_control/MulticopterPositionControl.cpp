@@ -162,6 +162,10 @@ void MulticopterPositionControl::parameters_update(bool force)
 		}
 
 		_control.setPositionGains(Vector3f(_param_mpc_xy_p.get(), _param_mpc_xy_p.get(), _param_mpc_z_p.get()));
+		_bw = _param_mc_pos_eso_bw.get();
+		_beta1 = 3.0f * _bw;
+		_beta2 = 3.0f * _bw * _bw;
+		_beta3 = _bw * _bw * _bw;
 		_control.setVelocityGains(
 			Vector3f(_param_mpc_xy_vel_p_acc.get(), _param_mpc_xy_vel_p_acc.get(), _param_mpc_z_vel_p_acc.get()),
 			Vector3f(_param_mpc_xy_vel_i_acc.get(), _param_mpc_xy_vel_i_acc.get(), _param_mpc_z_vel_i_acc.get()),
@@ -536,9 +540,13 @@ void MulticopterPositionControl::Run()
 
 			// Publish attitude setpoint output
 			vehicle_attitude_setpoint_s attitude_setpoint{};
-			_control.getAttitudeSetpoint(attitude_setpoint,_param_omni_att_mode.get());
+			_control.getAttitudeSetpoint(attitude_setpoint, _param_omni_att_mode.get(),_z3);
 			attitude_setpoint.timestamp = hrt_absolute_time();
 			_vehicle_attitude_setpoint_pub.publish(attitude_setpoint);
+
+			const Vector3f thrust{attitude_setpoint.thrust_body};
+			const Vector3f pos{local_pos_sp.x, local_pos_sp.y, local_pos_sp.z};
+			updatePositionESO(thrust, pos, dt);
 
 		} else {
 			// an update is necessary here because otherwise the takeoff state doesn't get skipped with non-altitude-controlled modes
@@ -559,6 +567,26 @@ void MulticopterPositionControl::Run()
 	}
 
 	perf_end(_cycle_perf);
+}
+void MulticopterPositionControl::updatePositionESO(const matrix::Vector3f thrust, const matrix::Vector3f pos, float dt)
+{
+	Vector3f pos_error;
+	pos_error(0) = PX4_ISFINITE(pos(0)) ? pos(0)-_z1(0) : 0.f;
+	pos_error(1) = PX4_ISFINITE(pos(1)) ? pos(1)-_z1(1) : 0.f;
+	pos_error(2) = PX4_ISFINITE(pos(2)) ? pos(2)-_z1(2) : 0.f;
+	Vector3f dot_z1 = _z2 + _beta1 * pos_error;
+	Vector3f dot_z2 = thrust + _z3 + _beta2 * pos_error;
+	Vector3f dot_z3 = _beta3 * pos_error;
+	// PX4_INFO("------dt = %.3f-------", (double)dt);
+	// PX4_INFO("------dot_z3_0 = %.3f-------", (double)dot_z3(0));
+	// PX4_INFO("------dot_z3_1 = %.3f-------", (double)dot_z3(1));
+	// PX4_INFO("------dot_z3_2 = %.3f-------", (double)dot_z3(2));
+	_z1 += dot_z1 * dt;
+	_z2 += dot_z2 * dt;
+	_z3 += dot_z3 * dt;
+	PX4_INFO("------z3_0 = %.3f-------", (double)_z3(0));
+	PX4_INFO("------z3_1 = %.3f-------", (double)_z3(1));
+	PX4_INFO("------z3_2 = %.3f-------", (double)_z3(2));
 }
 
 trajectory_setpoint_s MulticopterPositionControl::generateFailsafeSetpoint(const hrt_abstime &now,
