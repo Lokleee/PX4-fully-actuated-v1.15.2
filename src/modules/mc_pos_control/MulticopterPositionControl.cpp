@@ -584,9 +584,9 @@ void MulticopterPositionControl::updatePositionESO(const matrix::Vector3f thrust
 	_z1 += dot_z1 * dt;
 	_z2 += dot_z2 * dt;
 	_z3 += dot_z3 * dt;
-	PX4_INFO("------z3_0 = %.3f-------", (double)_z3(0));
-	PX4_INFO("------z3_1 = %.3f-------", (double)_z3(1));
-	PX4_INFO("------z3_2 = %.3f-------", (double)_z3(2));
+	// PX4_INFO("------z3_0 = %.3f-------", (double)_z3(0));
+	// PX4_INFO("------z3_1 = %.3f-------", (double)_z3(1));
+	// PX4_INFO("------z3_2 = %.3f-------", (double)_z3(2));
 }
 
 trajectory_setpoint_s MulticopterPositionControl::generateFailsafeSetpoint(const hrt_abstime &now,
