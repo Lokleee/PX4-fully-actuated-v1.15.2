@@ -80,10 +80,23 @@ MulticopterRateControl::parameters_updated()
 	// to the ideal (K * [1 + 1/sTi + sTd]) form
 	const Vector3f rate_k = Vector3f(_param_mc_rollrate_k.get(), _param_mc_pitchrate_k.get(), _param_mc_yawrate_k.get());
 
+	// When feedforward is enabled, simplify angular rate control to P-only and use specific gains
+	Vector3f rate_p_gains = _param_mc_ff_en.get() ?
+				Vector3f(0.05f, 0.05f, 0.01f) :
+				Vector3f(_param_mc_rollrate_p.get(), _param_mc_pitchrate_p.get(), _param_mc_yawrate_p.get());
+
+	Vector3f rate_i_gains = _param_mc_ff_en.get() ?
+				Vector3f(0.f, 0.f, 0.f) :
+				Vector3f(_param_mc_rollrate_i.get(), _param_mc_pitchrate_i.get(), _param_mc_yawrate_i.get());
+
+	Vector3f rate_d_gains = _param_mc_ff_en.get() ?
+				Vector3f(0.f, 0.f, 0.f) :
+				Vector3f(_param_mc_rollrate_d.get(), _param_mc_pitchrate_d.get(), _param_mc_yawrate_d.get());
+
 	_rate_control.setPidGains(
-		rate_k.emult(Vector3f(_param_mc_rollrate_p.get(), _param_mc_pitchrate_p.get(), _param_mc_yawrate_p.get())),
-		rate_k.emult(Vector3f(_param_mc_rollrate_i.get(), _param_mc_pitchrate_i.get(), _param_mc_yawrate_i.get())),
-		rate_k.emult(Vector3f(_param_mc_rollrate_d.get(), _param_mc_pitchrate_d.get(), _param_mc_yawrate_d.get())));
+		rate_k.emult(rate_p_gains),
+		rate_k.emult(rate_i_gains),
+		rate_k.emult(rate_d_gains));
 
 	_rate_control.setIntegratorLimit(
 		Vector3f(_param_mc_rr_int_lim.get(), _param_mc_pr_int_lim.get(), _param_mc_yr_int_lim.get()));
@@ -187,6 +200,13 @@ MulticopterRateControl::Run()
 			}
 		}
 
+		mpc_torque_feedforward_s mpc_torque_feedforward{};
+
+		if (_param_mc_ff_en.get() && _mpc_torque_feedforward_sub.update(&mpc_torque_feedforward)) {
+			_force_ff  = Vector3f(mpc_torque_feedforward.fxyz);
+			_torque_ff = Vector3f(mpc_torque_feedforward.txyz);
+		}
+
 		// run the rate controller
 		if (_vehicle_control_mode.flag_control_rates_enabled) {
 
@@ -230,10 +250,22 @@ MulticopterRateControl::Run()
 			vehicle_thrust_setpoint_s vehicle_thrust_setpoint{};
 			vehicle_torque_setpoint_s vehicle_torque_setpoint{};
 
-			_thrust_setpoint.copyTo(vehicle_thrust_setpoint.xyz);
-			vehicle_torque_setpoint.xyz[0] = PX4_ISFINITE(att_control(0)) ? att_control(0)-_z2(0) : 0.f;
-			vehicle_torque_setpoint.xyz[1] = PX4_ISFINITE(att_control(1)) ? att_control(1)-_z2(1) : 0.f;
-			vehicle_torque_setpoint.xyz[2] = PX4_ISFINITE(att_control(2)) ? att_control(2)-_z2(2) : 0.f;
+			// _thrust_setpoint.copyTo(vehicle_thrust_setpoint.xyz);
+			const float torque_ff_roll  = _param_mc_ff_en.get() && PX4_ISFINITE(_torque_ff(0)) ? _torque_ff(0) : 0.f;
+			const float torque_ff_pitch = _param_mc_ff_en.get() && PX4_ISFINITE(_torque_ff(1)) ? _torque_ff(1) : 0.f;
+			const float torque_ff_yaw   = _param_mc_ff_en.get() && PX4_ISFINITE(_torque_ff(2)) ? _torque_ff(2) : 0.f;
+
+			vehicle_torque_setpoint.xyz[0] = PX4_ISFINITE(att_control(0)) ? att_control(0) + torque_ff_roll - _z2(0) : torque_ff_roll - _z2(0);
+			vehicle_torque_setpoint.xyz[1] = PX4_ISFINITE(att_control(1)) ? att_control(1) + torque_ff_pitch - _z2(1) : torque_ff_pitch - _z2(1);
+			vehicle_torque_setpoint.xyz[2] = PX4_ISFINITE(att_control(2)) ? att_control(2) + torque_ff_yaw - _z2(2) : torque_ff_yaw - _z2(2);
+
+			const float thrust_ff_x = _param_mc_ff_en.get() && PX4_ISFINITE(_force_ff(0)) ? _force_ff(0) : 0.f;
+			const float thrust_ff_y = _param_mc_ff_en.get() && PX4_ISFINITE(_force_ff(1)) ? _force_ff(1) : 0.f;
+			const float thrust_ff_z = _param_mc_ff_en.get() && PX4_ISFINITE(_force_ff(2)) ? _force_ff(2) : 0.f;
+
+			vehicle_thrust_setpoint.xyz[0] = _thrust_setpoint(0) + thrust_ff_x;
+			vehicle_thrust_setpoint.xyz[1] = _thrust_setpoint(1) + thrust_ff_y;
+			vehicle_thrust_setpoint.xyz[2] = _thrust_setpoint(2) + thrust_ff_z;
 
 			// scale setpoints by battery status if enabled
 			if (_param_mc_bat_scale_en.get()) {

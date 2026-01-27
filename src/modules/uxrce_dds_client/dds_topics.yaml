@@ -26,6 +26,9 @@ publications:
   - topic: /fmu/out/estimator_status_flags
     type: px4_msgs::msg::EstimatorStatusFlags
 
+  # - topic: /fmu/out/esc_status
+  #   type: px4_msgs::msg::EscStatus
+
   - topic: /fmu/out/failsafe_flags
     type: px4_msgs::msg::FailsafeFlags
 
@@ -64,6 +67,12 @@ publications:
 
   - topic: /fmu/out/vehicle_local_position
     type: px4_msgs::msg::VehicleLocalPosition
+
+  # - topic: /fmu/out/vehicle_thrust_setpoint
+  #   type: px4_msgs::msg::VehicleThrustSetpoint
+
+  # - topic: /fmu/out/vehicle_torque_setpoint
+  #   type: px4_msgs::msg::VehicleTorqueSetpoint
 
   - topic: /fmu/out/vehicle_odometry
     type: px4_msgs::msg::VehicleOdometry
@@ -162,6 +171,9 @@ subscriptions:
 
   - topic: /fmu/in/aux_global_position
     type: px4_msgs::msg::VehicleGlobalPosition
+
+  # - topic: /fmu/in/mpc_torque_feedforward
+  #   type: px4_msgs::msg::MpcTorqueFeedforward
 
 # Create uORB::PublicationMulti
 subscriptions_multi:

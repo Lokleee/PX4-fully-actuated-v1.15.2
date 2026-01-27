@@ -137,5 +137,6 @@
                 "/opt/ros/humble/lib/python3.10/site-packages",
                 "/opt/ros/humble/local/lib/python3.10/dist-packages"
         ],
-        "window.zoomLevel": 1
+        "window.zoomLevel": 1,
+        "ROS2.distro": "humble"
 }

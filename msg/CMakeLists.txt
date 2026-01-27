@@ -145,6 +145,7 @@ set(msg_files
 	MissionResult.msg
 	MountOrientation.msg
 	ModeCompleted.msg
+	MpcTorqueFeedforward.msg
 	NavigatorMissionItem.msg
 	NormalizedUnsignedSetpoint.msg
 	NpfgStatus.msg

@@ -56,7 +56,21 @@ param set-default CA_ROTOR5_AY 0.4330125
 param set-default CA_ROTOR5_AZ -0.866025
 param set-default CA_ROTOR5_KM -0.05
 
-param set-default OMNI_ATT_MODE 1
+param set-default OMNI_ATT_MODE 0
+param set-default MC_FF_EN 0
+param set-default MC_ATTI_ESO_BW 0.0
+param set-default MC_POS_ESO_BW 0.0
+
+# param set-default MPC_Z_P 0.2
+# param set-default MPC_XY_P 0.2
+# param set-default MPC_Z_VEL_P_ACC 0.5
+# param set-default MPC_XY_VEL_P_ACC 0.3
+# param set-default MC_ROLLRATE_P 0.05
+# param set-default MC_PITCHRATE_P 0.05
+# param set-default MC_YAWRATE_P 0.01
+# param set-default MC_ROLL_P 1
+# param set-default MC_PITCH_P 1
+# param set-default MC_YAW_P 0.5
 
 param set-default SIM_GZ_EN 1
 param set-default SENS_EN_GPSSIM 1

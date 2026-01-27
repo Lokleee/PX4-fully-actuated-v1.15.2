@@ -314,3 +314,16 @@ PARAM_DEFINE_INT32(MC_BAT_SCALE_EN, 0);
  * @group Multicopter Rate Control
  */
 PARAM_DEFINE_FLOAT(MC_ATTI_ESO_BW, 0.5f);
+
+/**
+ * Force and Torque Feedforward Enable
+ *
+ * Enable or disable force and torque feedforward from external MPC controller.
+ * When enabled (1), the position and attitude control loops are simplified to only use
+ * proportional gains, and feedforward commands from the MPC are added directly to
+ * the control output. When disabled (0), normal PD control is used.
+ *
+ * @boolean
+ * @group Multicopter Rate Control
+ */
+PARAM_DEFINE_INT32(MC_FF_EN, 0);

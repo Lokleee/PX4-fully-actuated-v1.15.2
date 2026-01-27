@@ -161,15 +161,31 @@ void MulticopterPositionControl::parameters_update(bool force)
 					    "Land tilt limit has been constrained by maximum tilt", _param_mpc_tiltmax_air.get());
 		}
 
-		_control.setPositionGains(Vector3f(_param_mpc_xy_p.get(), _param_mpc_xy_p.get(), _param_mpc_z_p.get()));
+		// When feedforward is enabled, use specific position gains
+		Vector3f pos_p_gains = _param_mc_ff_en.get() ?
+				       Vector3f(0.2f, 0.2f, 0.2f) :
+				       Vector3f(_param_mpc_xy_p.get(), _param_mpc_xy_p.get(), _param_mpc_z_p.get());
+
+		_control.setPositionGains(pos_p_gains);
 		_bw = _param_mc_pos_eso_bw.get();
 		_beta1 = 3.0f * _bw;
 		_beta2 = 3.0f * _bw * _bw;
 		_beta3 = _bw * _bw * _bw;
-		_control.setVelocityGains(
-			Vector3f(_param_mpc_xy_vel_p_acc.get(), _param_mpc_xy_vel_p_acc.get(), _param_mpc_z_vel_p_acc.get()),
-			Vector3f(_param_mpc_xy_vel_i_acc.get(), _param_mpc_xy_vel_i_acc.get(), _param_mpc_z_vel_i_acc.get()),
-			Vector3f(_param_mpc_xy_vel_d_acc.get(), _param_mpc_xy_vel_d_acc.get(), _param_mpc_z_vel_d_acc.get()));
+
+		// When feedforward is enabled, simplify velocity control to P-only and use specific gains
+		Vector3f vel_p_gains = _param_mc_ff_en.get() ?
+				       Vector3f(0.3f, 0.3f, 0.5f) :
+				       Vector3f(_param_mpc_xy_vel_p_acc.get(), _param_mpc_xy_vel_p_acc.get(), _param_mpc_z_vel_p_acc.get());
+
+		Vector3f vel_i_gains = _param_mc_ff_en.get() ?
+				       Vector3f(0.f, 0.f, 0.f) :
+				       Vector3f(_param_mpc_xy_vel_i_acc.get(), _param_mpc_xy_vel_i_acc.get(), _param_mpc_z_vel_i_acc.get());
+
+		Vector3f vel_d_gains = _param_mc_ff_en.get() ?
+				       Vector3f(0.f, 0.f, 0.f) :
+				       Vector3f(_param_mpc_xy_vel_d_acc.get(), _param_mpc_xy_vel_d_acc.get(), _param_mpc_z_vel_d_acc.get());
+
+		_control.setVelocityGains(vel_p_gains, vel_i_gains, vel_d_gains);
 		_control.setHorizontalThrustMargin(_param_mpc_thr_xy_marg.get());
 		_control.decoupleHorizontalAndVecticalAcceleration(_param_mpc_acc_decouple.get());
 		_goto_control.setParamMpcAccHor(_param_mpc_acc_hor.get());
