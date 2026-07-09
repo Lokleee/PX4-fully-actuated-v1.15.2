@@ -83,6 +83,14 @@ private:
 	perf_counter_t _loop_perf{perf_alloc(PC_ELAPSED, MODULE_NAME": cycle")};
 
 	DEFINE_PARAMETERS(
-		(ParamInt<px4::params::SIM_GPS_USED>) _sim_gps_used
+		(ParamInt<px4::params::SIM_GPS_USED>) _sim_gps_used,
+		(ParamFloat<px4::params::SIM_GPS_XY_STD>) _sim_gps_xy_std,
+		(ParamFloat<px4::params::SIM_GPS_Z_STD>) _sim_gps_z_std,
+		(ParamFloat<px4::params::SIM_GPS_VN_STD>) _sim_gps_vn_std,
+		(ParamFloat<px4::params::SIM_GPS_VE_STD>) _sim_gps_ve_std,
+		(ParamFloat<px4::params::SIM_GPS_VD_STD>) _sim_gps_vd_std,
+		(ParamFloat<px4::params::SIM_GPS_EPH>) _sim_gps_eph,
+		(ParamFloat<px4::params::SIM_GPS_EPV>) _sim_gps_epv,
+		(ParamFloat<px4::params::SIM_GPS_SACC>) _sim_gps_sacc
 	)
 };

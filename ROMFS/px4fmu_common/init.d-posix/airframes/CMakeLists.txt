@@ -90,6 +90,9 @@ px4_add_romfs_files(
 	6026_gazebo-classic_skyvortex
 	6027_gz_skyvortex
 	6028_gz_skyvortex_ocee
+	6029_gz_skyvortex_fork
+	6030_gz_skyvortex_v4
+	6031_gz_skyvortex_v4_locked
 
 	8011_gz_omnicopter
 

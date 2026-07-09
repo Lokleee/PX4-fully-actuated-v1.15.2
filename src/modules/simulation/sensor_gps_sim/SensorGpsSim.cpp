@@ -39,6 +39,11 @@
 
 using namespace matrix;
 
+static float nonnegative(float value)
+{
+	return value > 0.f ? value : 0.f;
+}
+
 SensorGpsSim::SensorGpsSim() :
 	ModuleParams(nullptr),
 	ScheduledWorkItem(MODULE_NAME, px4::wq_configurations::hp_default)
@@ -114,11 +119,22 @@ void SensorGpsSim::Run()
 		vehicle_global_position_s gpos{};
 		_vehicle_global_position_sub.copy(&gpos);
 
-		double latitude = gpos.lat + math::degrees((double)generate_wgn() * 0.2 / CONSTANTS_RADIUS_OF_EARTH);
-		double longitude = gpos.lon + math::degrees((double)generate_wgn() * 0.2 / CONSTANTS_RADIUS_OF_EARTH);
-		double altitude = (double)(gpos.alt + (generate_wgn() * 0.5f));
+		const float gps_xy_std = nonnegative(_sim_gps_xy_std.get());
+		const float gps_z_std = nonnegative(_sim_gps_z_std.get());
+		const float gps_vn_std = nonnegative(_sim_gps_vn_std.get());
+		const float gps_ve_std = nonnegative(_sim_gps_ve_std.get());
+		const float gps_vd_std = nonnegative(_sim_gps_vd_std.get());
+		const float gps_eph = nonnegative(_sim_gps_eph.get());
+		const float gps_epv = nonnegative(_sim_gps_epv.get());
+		const float gps_sacc = nonnegative(_sim_gps_sacc.get());
 
-		Vector3f gps_vel = Vector3f{lpos.vx, lpos.vy, lpos.vz} + noiseGauss3f(0.06f, 0.077f, 0.158f);
+		const double gps_xy_std_d = static_cast<double>(gps_xy_std);
+
+		double latitude = gpos.lat + math::degrees(static_cast<double>(generate_wgn()) * gps_xy_std_d / CONSTANTS_RADIUS_OF_EARTH);
+		double longitude = gpos.lon + math::degrees(static_cast<double>(generate_wgn()) * gps_xy_std_d / CONSTANTS_RADIUS_OF_EARTH);
+		double altitude = (double)(gpos.alt + (generate_wgn() * gps_z_std));
+
+		Vector3f gps_vel = Vector3f{lpos.vx, lpos.vy, lpos.vz} + noiseGauss3f(gps_vn_std, gps_ve_std, gps_vd_std);
 
 		// device id
 		device::Device::DeviceId device_id;
@@ -132,10 +148,10 @@ void SensorGpsSim::Run()
 		if (_sim_gps_used.get() >= 4) {
 			// fix
 			sensor_gps.fix_type = 3; // 3D fix
-			sensor_gps.s_variance_m_s = 0.4f;
+			sensor_gps.s_variance_m_s = gps_sacc;
 			sensor_gps.c_variance_rad = 0.1f;
-			sensor_gps.eph = 0.9f;
-			sensor_gps.epv = 1.78f;
+			sensor_gps.eph = gps_eph;
+			sensor_gps.epv = gps_epv;
 			sensor_gps.hdop = 0.7f;
 			sensor_gps.vdop = 1.1f;
 

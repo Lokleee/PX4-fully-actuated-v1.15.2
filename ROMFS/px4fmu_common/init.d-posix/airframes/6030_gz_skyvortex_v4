@@ -78,18 +78,6 @@ param set-default SENS_EN_GPSSIM 1
 param set-default SENS_EN_BAROSIM 0
 param set-default SENS_EN_MAGSIM 1
 
-# Skyvortex controller tuning uses deterministic simulated GPS. Keep the
-# measurement noise and reported accuracy consistent, otherwise EKF2 will still
-# treat the clean GPS as a weak meter-level height source.
-param set-default SIM_GPS_XY_STD 0.0
-param set-default SIM_GPS_Z_STD 0.0
-param set-default SIM_GPS_VN_STD 0.0
-param set-default SIM_GPS_VE_STD 0.0
-param set-default SIM_GPS_VD_STD 0.0
-param set-default SIM_GPS_EPH 0.05
-param set-default SIM_GPS_EPV 0.05
-param set-default SIM_GPS_SACC 0.03
-
 param set-default SIM_GZ_EC_FUNC1 101
 param set-default SIM_GZ_EC_FUNC2 102
 param set-default SIM_GZ_EC_FUNC3 103

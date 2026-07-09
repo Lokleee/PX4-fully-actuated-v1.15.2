@@ -1,0 +1,115 @@
+#!/bin/sh
+#
+# @name Skyvortex V4 Locked
+#
+# @type Tilt-Hexarotor
+# @class Copter
+#
+# @maintainer Li Zhengchen <lizc@hnu.edu.cn>
+#
+
+. ${R}etc/init.d/rc.mc_defaults
+
+PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
+PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
+PX4_SIM_MODEL=${PX4_SIM_MODEL:=skyvortex_v4_locked}
+
+param set-default CA_AIRFRAME 0
+
+# MAV_TYPE_HEXAROTOR 13
+param set-default MAV_TYPE 13
+
+param set-default FD_ESCS_EN 0
+
+param set-default CA_ROTOR_COUNT 6
+
+# Rotor geometry from Tools/simulation/gz/models/skyvortex_v4_locked/model.sdf.
+# SDF rotor order: motor 0..5 = xyj1, xyj2, xyj3, xyj6, xyj5, xyj4.
+param set-default CA_ROTOR0_PX 0.522898
+param set-default CA_ROTOR0_PY -0.294659
+param set-default CA_ROTOR0_PZ 0.0395
+param set-default CA_ROTOR0_AX 0.230487
+param set-default CA_ROTOR0_AY 0.443707
+param set-default CA_ROTOR0_AZ 0.866025
+
+param set-default CA_ROTOR1_PX -0.006373
+param set-default CA_ROTOR1_PY -0.600235
+param set-default CA_ROTOR1_PZ 0.0395
+param set-default CA_ROTOR1_AX -0.499505
+param set-default CA_ROTOR1_AY 0.022246
+param set-default CA_ROTOR1_AZ 0.866025
+param set-default CA_ROTOR1_KM -0.05
+
+param set-default CA_ROTOR2_PX -0.50576
+param set-default CA_ROTOR2_PY -0.323421
+param set-default CA_ROTOR2_PZ 0.0395
+param set-default CA_ROTOR2_AX 0.283563
+param set-default CA_ROTOR2_AY -0.411816
+param set-default CA_ROTOR2_AZ 0.866025
+
+param set-default CA_ROTOR3_PX 0.5229
+param set-default CA_ROTOR3_PY 0.29466
+param set-default CA_ROTOR3_PZ 0.0395
+param set-default CA_ROTOR3_AX 0.230486
+param set-default CA_ROTOR3_AY -0.443708
+param set-default CA_ROTOR3_AZ 0.866025
+param set-default CA_ROTOR3_KM -0.05
+
+param set-default CA_ROTOR4_PX -0.006374
+param set-default CA_ROTOR4_PY 0.600235
+param set-default CA_ROTOR4_PZ 0.0395
+param set-default CA_ROTOR4_AX -0.499505
+param set-default CA_ROTOR4_AY -0.022246
+param set-default CA_ROTOR4_AZ 0.866025
+param set-default CA_ROTOR4_KM -0.05
+
+param set-default CA_ROTOR5_PX -0.50576
+param set-default CA_ROTOR5_PY 0.32342
+param set-default CA_ROTOR5_PZ 0.0395
+param set-default CA_ROTOR5_AX 0.283563
+param set-default CA_ROTOR5_AY 0.411816
+param set-default CA_ROTOR5_AZ 0.866025
+
+param set-default OMNI_ATT_MODE 1
+param set-default MC_POS_ESO_BW 0.0
+param set-default MC_ATTI_ESO_BW 0.0
+
+param set-default SIM_GZ_EN 1
+param set-default SENS_EN_GPSSIM 1
+param set-default SENS_EN_BAROSIM 0
+param set-default SENS_EN_MAGSIM 1
+
+param set-default SIM_GZ_EC_FUNC1 101
+param set-default SIM_GZ_EC_FUNC2 102
+param set-default SIM_GZ_EC_FUNC3 103
+param set-default SIM_GZ_EC_FUNC4 104
+param set-default SIM_GZ_EC_FUNC5 105
+param set-default SIM_GZ_EC_FUNC6 106
+
+param set-default SIM_GZ_EC_MIN1 0
+param set-default SIM_GZ_EC_MIN2 0
+param set-default SIM_GZ_EC_MIN3 0
+param set-default SIM_GZ_EC_MIN4 0
+param set-default SIM_GZ_EC_MIN5 0
+param set-default SIM_GZ_EC_MIN6 0
+
+# param set-default SIM_GZ_EC_MAX1 1500
+# param set-default SIM_GZ_EC_MAX2 1500
+# param set-default SIM_GZ_EC_MAX3 1500
+# param set-default SIM_GZ_EC_MAX4 1500
+# param set-default SIM_GZ_EC_MAX5 1500
+# param set-default SIM_GZ_EC_MAX6 1500
+
+param set-default SIM_GZ_EC_MAX1 2000
+param set-default SIM_GZ_EC_MAX2 2000
+param set-default SIM_GZ_EC_MAX3 2000
+param set-default SIM_GZ_EC_MAX4 2000
+param set-default SIM_GZ_EC_MAX5 2000
+param set-default SIM_GZ_EC_MAX6 2000
+
+# disable MC desaturation which improves attitude tracking
+param set-default CA_METHOD 0
+
+# disable attitude failure detection
+param set-default FD_FAIL_P 0
+param set-default FD_FAIL_R 0
